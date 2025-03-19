@@ -1,5 +1,7 @@
+import uuid
 from sqlalchemy import create_engine, text, Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy.dialects.postgresql import UUID  
 
 
 
@@ -12,17 +14,18 @@ Base = declarative_base()
 class SearchCriteria(Base):
     __tablename__ = "search_criteria"
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     keyword = Column(String, nullable=False)
     location = Column(String, nullable=True)   
     
     rawtable = relationship("RawTable", back_populates="searchcriteria", cascade="all, delete-orphan")
     # searchresult = relationship("SearchResult", back_populates="searchcriteria    ", cascade="all, delete-orphan")
+    
 class RawTable(Base):
     __tablename__ = "raw_data_table" 
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    search_criteria_id = Column(Integer, ForeignKey('search_criteria.id'), nullable=False)    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    search_criteria_id = Column(UUID(as_uuid=True), ForeignKey('search_criteria.id'), nullable=False)    
     raw_data = Column(String, nullable=False)  
  
     searchcriteria = relationship("SearchCriteria", back_populates="rawtable")
@@ -31,13 +34,13 @@ class RawTable(Base):
 # class SearchResult(Base):
 #     __tablename__="search_result"
     
-#     id = Column(Integer, primary_key=True, autoincrement=True )
+#     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
 #     date_search = Column(DateTime)
 #     date_posted = Column(DateTime)
 #     html_string = Column(String)
 #     is_processed = Column(Boolean)
 #     url_source = Column(String)
-#     search_criteria_id = Column(Integer, ForeignKey('search_criteria.id'))
+#     search_criteria_id = Column(UUID(as_uuid=True), ForeignKey('search_criteria.id'), nullable=False)
     
 #     searchcriteria = relationship("SearchCriteria", back_populates="searchresult")
 #     qualification = relationship("Qualification", back_populates="searchresult", cascade="all, delete-orphan")
