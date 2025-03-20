@@ -58,7 +58,7 @@ def scrape_jobstreet(job_keyword,location_keyword):
                 next_button = page.locator("a[aria-label='Next']")
                 print(is_button_visible)
                 
-                if is_button_visible == True and next_button.count() > 0 and len(job_elements) == 32:
+                if is_button_visible == True and next_button.count() > 0:
                     print("Going to the next page...")
                     page.locator("a[aria-label='Next']").click()
                     page.wait_for_timeout(10000)  
@@ -77,6 +77,3 @@ def scrape_jobstreet(job_keyword,location_keyword):
         finally:
             browser.close()
             return jobs
-        
-        
-scrape_jobstreet("data engineer", 'cavite')
