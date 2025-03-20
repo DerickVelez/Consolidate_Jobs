@@ -42,7 +42,7 @@ def insert_raw_data(keyword, location):
     finally: 
         session.close()
 
-insert_raw_data("data engineer", 'laguna') 
+insert_raw_data("industrial engineer", 'laguna') 
 
 # # job_list = scrape_jobstree/t("data engineer", "laguna")
 # test_data = 'something data'
