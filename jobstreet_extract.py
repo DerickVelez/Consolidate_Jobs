@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+import re
 from playwright.sync_api import sync_playwright
+
 
 def scrape_jobstreet(job_keyword,location_keyword):
     with sync_playwright() as p:
@@ -35,21 +38,48 @@ def scrape_jobstreet(job_keyword,location_keyword):
                         page.wait_for_selector('h1', timeout=15000)
                         
                         #Extract information --- if those 2 variables will be commentd job description will not be extracted
-                        job_title = page.text_content('h1') or "N/A"
+                        job_title = page.text_content('[data-automation="job-detail-title"]') or "N/A"
                         company_name = page.text_content('[data-automation="advertiser-name"]') or "N/A"
-                        # location = page.text_content('[data-automation="job-detail-location"]') or "N/A"
-                        # job_type = page.text_content('[data-automation="job-detail-classifications"]') or "N/A"
-                        # posted_time = page.text_content('[data-automation="job-detail-work-type"]') or "N/A"
-                        # salary_element = page.query_selector('[data-automation="job-detail-add-expected-salary"]')
-                        # if not salary_element:
-                        #     salary_element = page.query_selector('[data-automation="job-detail-salary"]')
+                        location = page.text_content('[data-automation="job-detail-location"]') or "N/A"
+                        industry = page.text_content('[data-automation="job-detail-classifications"]') or "N/A"
+                        job_type = page.text_content('[data-automation="job-detail-work-type"]') or "N/A"
+                        job_details = page.text_content('[data-automation="jobAdDetails"]') or "N/A" 
+                        salary_element = page.query_selector('[data-automation="job-detail-add-expected-salary"]')
+                        if not salary_element:
+                            salary_element = page.query_selector('[data-automation="job-detail-salary"]')
 
-                        # salary = salary_element.text_content().strip() if salary_element else "N/A"
+                        salary = salary_element.text_content().strip() if salary_element else "N/A"
                         
-                        job_description_element = page.query_selector('[data-automation="splitViewJobDetailsWrapper"]')
-                        job_description = job_description_element.text_content().strip() 
+                        date_searched = datetime.today()
+                        date_text = page.locator("//span[contains(text(), 'Posted')]").inner_text()
                         
-                        jobs.append(counter + job_description)
+                        day_number = re.findall(r'\d+', date_text)  
+                        days_to_add = int(day_number[0])
+                        hour_or_day = date_text[-5]
+                       
+                        if  hour_or_day == 'd':
+                            date_posted = date_searched - timedelta(days=days_to_add)
+                        if  hour_or_day == "h":
+                            date_posted = date_searched - timedelta(days=1)
+                        if hour_or_day == "+":
+                            date_posted = date_searched - timedelta(days=30)
+                            
+                        # job_description_element = page.query_selector('[data-automation="splitViewJobDetailsWrapper"]')
+                        # job_description = job_description_element.text_content().strip() 
+                        
+                        job_overview = {"job title": job_title, 
+                                            "company": company_name, 
+                                            "location": location,
+                                            "Industry": industry, 
+                                            "date posted": job_type, 
+                                            "expected salary": salary,
+                                            "job details": job_details,
+                                            "date_search": date_searched,
+                                            "date_posted" : date_posted.date()}
+                                            
+                        print(day_number, hour_or_day)
+                        print(date_posted.date())
+                        jobs.append( job_overview)
                         page.wait_for_timeout(2000)
                     else:
                         break
@@ -58,7 +88,7 @@ def scrape_jobstreet(job_keyword,location_keyword):
                 next_button = page.locator("a[aria-label='Next']")
                 print(is_button_visible)
                 
-                if is_button_visible == True and next_button.count() > 0:
+                if is_button_visible == True and next_button.count() > 0 and len(job_elements) == 32:
                     print("Going to the next page...")
                     page.locator("a[aria-label='Next']").click()
                     page.wait_for_timeout(10000)  
@@ -75,5 +105,8 @@ def scrape_jobstreet(job_keyword,location_keyword):
             print(f'Error in extracting data: {e}')
             
         finally:
-            browser.close()
+            browser.close() 
             return jobs
+        
+        
+scrape_jobstreet("data engineer", 'cavite')

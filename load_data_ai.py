@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker
 from create_class import SearchCriteria, RawTable
-from jobstreet_extract import scrape_jobstreet
+from jobstreet_extract_ai import scrape_jobstreet
 
 
 DB_URL = "postgresql://postgres:Workeye29@localhost:5432/alljobs"
@@ -42,7 +42,7 @@ def insert_raw_data(keyword, location):
     finally: 
         session.close()
 
-insert_raw_data("industrial engineer", 'laguna') 
+insert_raw_data("data engineer", 'cavite') 
 
 # # job_list = scrape_jobstree/t("data engineer", "laguna")
 # test_data = 'something data'

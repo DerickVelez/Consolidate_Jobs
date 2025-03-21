@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import create_engine, text, Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import create_engine, text, Column, Integer, String, ForeignKey, DateTime, Boolean, JSON
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy.dialects.postgresql import UUID  
 
@@ -20,13 +20,13 @@ class SearchCriteria(Base):
     
     rawtable = relationship("RawTable", back_populates="searchcriteria", cascade="all, delete-orphan")
     # searchresult = relationship("SearchResult", back_populates="searchcriteria    ", cascade="all, delete-orphan")
-    
+
 class RawTable(Base):
     __tablename__ = "raw_data_table" 
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     search_criteria_id = Column(UUID(as_uuid=True), ForeignKey('search_criteria.id'), nullable=False)    
-    raw_data = Column(String, nullable=False)  
+    raw_data = Column(JSON)  
  
     searchcriteria = relationship("SearchCriteria", back_populates="rawtable")
 
@@ -35,7 +35,7 @@ class RawTable(Base):
 #     __tablename__="search_result"
     
 #     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-#     date_search = Column(DateTime)
+#     date_search = Column(DateTime, nullable=False)
 #     date_posted = Column(DateTime)
 #     html_string = Column(String)
 #     is_processed = Column(Boolean)
@@ -51,7 +51,7 @@ class RawTable(Base):
 #     id = Column(Integer, primary_key=True)
 #     skills_required = Column(String)
 #     years_of_experience = Column(Integer)
-#     company_name = Column(String)
+#     company_name = Column(String, nullable=False)
 #     search_result_id = Column(Integer, ForeignKey('search_result.id'))
     
 #     searchresult = relationship("SearchResult", back_populates="qualification")
