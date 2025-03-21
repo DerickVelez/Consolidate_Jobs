@@ -58,11 +58,11 @@ def scrape_jobstreet(job_keyword,location_keyword):
                         hour_or_day = date_text[-5]
                        
                         if  hour_or_day == 'd':
-                            date_posted = date_searched + timedelta(days=days_to_add)
+                            date_posted = date_searched - timedelta(days=days_to_add)
                         if  hour_or_day == "h":
-                            date_posted = date_searched + timedelta(days=1)
+                            date_posted = date_searched - timedelta(days=1)
                         if hour_or_day == "+":
-                            date_posted = date_searched + timedelta(days=30)
+                            date_posted = date_searched - timedelta(days=30)
                             
                         # job_description_element = page.query_selector('[data-automation="splitViewJobDetailsWrapper"]')
                         # job_description = job_description_element.text_content().strip() 
