@@ -44,6 +44,7 @@ def scrape_jobstreet(job_keyword,location_keyword):
                         industry = page.text_content('[data-automation="job-detail-classifications"]') or "N/A"
                         job_type = page.text_content('[data-automation="job-detail-work-type"]') or "N/A"
                         job_details = page.text_content('[data-automation="jobAdDetails"]') or "N/A" 
+                        url_source = page.locator("h1.gepq850.eihuid4z").locator("a").get_attribute("href")
                         salary_element = page.query_selector('[data-automation="job-detail-add-expected-salary"]')
                         if not salary_element:
                             salary_element = page.query_selector('[data-automation="job-detail-salary"]')
@@ -73,12 +74,12 @@ def scrape_jobstreet(job_keyword,location_keyword):
                                             "Industry": industry, 
                                             "date posted": job_type, 
                                             "expected salary": salary,
-                                            "job details": job_details,
                                             "date_search": date_searched,
-                                            "date_posted" : date_posted.date()}
+                                            "date_posted" : date_posted.date(),
+                                            "url_source": url_source,
+                                            "job details": job_details}
                                             
-                        print(day_number, hour_or_day)
-                        print(date_posted.date())
+                        
                         jobs.append( job_overview)
                         page.wait_for_timeout(2000)
                     else:
