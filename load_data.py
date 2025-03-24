@@ -1,3 +1,4 @@
+import json
 from sqlalchemy import create_engine, text, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker
 from create_class import SearchCriteria, RawTable
@@ -22,12 +23,13 @@ def insert_raw_data(keyword, location):
     try: 
         
         result = scrape_jobstreet(keyword, location)
+        json_result = json.dumps(result,indent=4) 
         
         data = SearchCriteria(
             keyword = keyword,
             location = location,
             rawtable = [RawTable(
-                raw_data = result
+                raw_data = json_result
             )]
             
         )
@@ -42,7 +44,7 @@ def insert_raw_data(keyword, location):
     finally: 
         session.close()
 
-insert_raw_data("data engineer", 'cavite') 
+insert_raw_data("data engineer", 'laguna') 
 
 # # job_list = scrape_jobstree/t("data engineer", "laguna")
 # test_data = 'something data'

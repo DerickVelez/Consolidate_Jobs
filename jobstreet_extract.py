@@ -71,10 +71,10 @@ def scrape_jobstreet(job_keyword,location_keyword):
                                             "Industry": industry, 
                                             "date posted": job_type, 
                                             "expected salary": salary,
-                                            "date_search": date_searched.date(),
-                                            "date_posted" : date_posted.date(),
+                                            "date_search": date_searched.strftime("%Y-%m-%d"),
+                                            "date_posted" : date_posted.strftime("%Y-%m-%d"),
                                             "url_source": url_source,
-                                            "job details": job_details}
+                                            "job_details": job_details}
                                             
                         
                         jobs.append( job_overview)
