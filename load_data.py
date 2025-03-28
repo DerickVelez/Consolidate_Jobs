@@ -1,65 +1,42 @@
 import json
-from sqlalchemy import create_engine, text, Column, Integer, String
-from sqlalchemy.orm import declarative_base, sessionmaker
-from create_class import SearchCriteria, RawTable
-from jobstreet_extract import scrape_jobstreet
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from create_class import RawTable, SearchCriteria, SearchResult, Qualification, Benefits, SkillsRequired
 
 
 DB_URL = "postgresql://postgres:Workeye29@localhost:5432/alljobs"
 engine = create_engine(DB_URL, pool_reset_on_return=None)
-Base = declarative_base()
-
-
 
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
-Base.metadata.create_all(engine)
+def load_overall_data(search_criteria_id):
+    raw_data =  session.query(RawTable).filter_by(search_criteria_id=search_criteria_id).first()
+    json_string =  json.loads(raw_data.raw_data)
 
-
-def insert_raw_data(keyword, location):
-    session = SessionLocal()
-    
-    try: 
-        
-        result = scrape_jobstreet(keyword, location)
-        json_result = json.dumps(result,indent=4) 
-        
-        data = SearchCriteria(
-            keyword = keyword,
-            location = location,
-            rawtable = [RawTable(
-                raw_data = json_result
-            )]
-            
-        )
-        
+    for row in json_string:
+        job_details = repr(row["job_details"]).replace("\n", ";")
+        print(job_details)
+        data = SearchResult(
+                    date_search = row["date_search"],
+                    date_posted = row["date_posted"],
+                    html_string = None,
+                    is_processed = True,
+                    job_responsibility = job_details,
+                    url_source = row["url_source"],
+                    search_criteria_id = search_criteria_id,
+                    qualification = [Qualification(
+                        qualification = job_details,
+                        years_of_experience = None,
+                        company_name = row["company"],
+                        benefits = [Benefits(
+                            benefits = job_details,                    
+                            skillsrequired = [SkillsRequired(
+                                skill = job_details )]
+                        )])])
+                    
         session.add(data)
         session.commit()
         session.refresh(data)
         
-    except Exception as e:
-        session.rollback()
-        print(f'Error inserting data: {e}')
-    finally: 
-        session.close()
-
-insert_raw_data("data engineer", 'laguna') 
-
-# # job_list = scrape_jobstree/t("data engineer", "laguna")
-# test_data = 'something data'
-# data = MyTable(raw_data=test_data)
-# # jobs = [MyTable(raw_data=job) for job in job_list]
-
-# # Bulk insert into database
-# session.add(data)
-# session.commit()
-
-
-# with engine.connect() as connection:
-#     result = connection.execute(text("SELECT * FROM raw_data_table;"))
-    
-    
-#     rows = result.fetchall()
-#     for row in rows:
-#         print(row)
+load_overall_data("fd7fd8c5-937c-4edf-bb19-8fa6fcebf252")

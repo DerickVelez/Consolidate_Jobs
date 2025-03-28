@@ -40,6 +40,7 @@ class SearchResult(Base):
     html_string = Column(String, nullable=True)
     is_processed = Column(Boolean, nullable=True)
     url_source = Column(String)
+    job_responsibility = Column(String)
     search_criteria_id = Column(UUID(as_uuid=True), ForeignKey('search_criteria.id'), nullable=False)
     
     searchcriteria = relationship("SearchCriteria", back_populates="searchresult")
@@ -49,7 +50,7 @@ class Qualification(Base):
     __tablename__="qualification"
     
     id = Column(Integer, primary_key=True)
-    quality_description = Column(String)
+    qualification = Column(String)
     years_of_experience = Column(Integer)
     company_name = Column(String, nullable=False)
     search_result_id = Column(UUID(as_uuid=True), ForeignKey('search_result.id'), nullable=False)
@@ -80,3 +81,5 @@ SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
 Base.metadata.create_all(engine)
+
+#no salaary on the schema add salaryyy!!
