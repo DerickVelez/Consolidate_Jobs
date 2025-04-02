@@ -27,17 +27,20 @@ class RawTable(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     search_criteria_id = Column(UUID(as_uuid=True), ForeignKey('search_criteria.id'), nullable=False)    
     raw_data = Column(JSON)  
+    job_details = Column(String)
  
     searchcriteria = relationship("SearchCriteria", back_populates="rawtable")
+    airesponse = relationship("AIResponse", back_populates="rawtable")
 
 
 class SearchResult(Base):
-    __tablename__="search_result"
+    __tablename__ = "search_result"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     date_search = Column(DateTime, nullable=False)
     date_posted = Column(DateTime)
     html_string = Column(String, nullable=True)
+    salary = Column(String)
     is_processed = Column(Boolean, nullable=True)
     url_source = Column(String)
     job_responsibility = Column(String)
@@ -47,7 +50,7 @@ class SearchResult(Base):
     qualification = relationship("Qualification", back_populates="searchresult", cascade="all, delete-orphan")
     
 class Qualification(Base):
-    __tablename__="qualification"
+    __tablename__ = "qualification"
     
     id = Column(Integer, primary_key=True)
     qualification = Column(String)
@@ -59,7 +62,7 @@ class Qualification(Base):
     benefits = relationship("Benefits", back_populates="qualification", cascade="all, delete-orphan")
     
 class Benefits(Base):
-    __tablename__="benefits"
+    __tablename__ = "benefits"
     
     id = Column(Integer, primary_key=True)
     benefits = Column(String)
@@ -69,17 +72,25 @@ class Benefits(Base):
     skillsrequired = relationship("SkillsRequired", back_populates="benefits", cascade="all, delete-orphan")
     
 class SkillsRequired(Base):
-    __tablename__='skills_required'
+    __tablename__ = 'skills_required'
     
     id = Column(Integer, primary_key=True)
     skill = Column(String)
     benefits_id = Column(Integer, ForeignKey('benefits.id'))
 
     benefits =  relationship("Benefits", back_populates="skillsrequired")
+    
+class AIResponse(Base):
+    __tablename__ = 'airesponse'
+    
+    id = id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    response = Column(String, nullable=False)
+    raw_table_id = Column(UUID(as_uuid=True), ForeignKey('raw_data_table.id'))
+    
+    rawtable = relationship("RawTable", back_populates="airesponse")    
 
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
 Base.metadata.create_all(engine)
 
-#no salaary on the schema add salaryyy!!
