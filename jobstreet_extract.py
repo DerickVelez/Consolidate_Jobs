@@ -3,7 +3,7 @@ import re
 from playwright.sync_api import sync_playwright
 
 
-def scrape_jobstreet(job_keyword,location_keyword):
+def find_job(job_keyword,location_keyword):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
@@ -14,7 +14,6 @@ def scrape_jobstreet(job_keyword,location_keyword):
         page.keyboard.press("Enter") 
         page.locator("#SearchBar__Where").fill(location_keyword)
         page.click("button:has-text('SEEK')")
-        
         
         try:
         
@@ -28,8 +27,6 @@ def scrape_jobstreet(job_keyword,location_keyword):
                 print(f"Page:{page_counter}")
                 
                 for index, job in enumerate(job_elements):
-                    #test purposes limit the jobs for 2 counts per page
-                    # if index < 2:
                         
                         counter = f"Clicking job {index + 1}/{len(job_elements)} : {page_counter}"
                         print(counter)
@@ -76,15 +73,11 @@ def scrape_jobstreet(job_keyword,location_keyword):
                                             "url_source": url_source,
                                             "job_details": job_details}
                                             
-                        
                         jobs.append( job_overview)
                         page.wait_for_timeout(2000)
-                    # else:
-                    #     break
-
+  
                 next_button = page.locator("a[aria-label='Next']")
-                
-                # extraction stoppage (32 normal jobs count per page )
+
                 if  next_button.count() > 0 and len(job_elements) == 32:
                     print("Going to the next page...")
                     page.locator("a[aria-label='Next']").click()
@@ -95,14 +88,14 @@ def scrape_jobstreet(job_keyword,location_keyword):
                     print("No more pages found. Exiting.")
                     break  
             
-            browser.close()
             return jobs
         
         except Exception as e:
             print(f'Error in extracting data: {e}')
-            
+            return jobs
+        
         finally:
             browser.close() 
-            return jobs
+            
         
         
