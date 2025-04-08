@@ -1,7 +1,6 @@
 import json
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from create_class import RawTable, SearchCriteria, SearchResult, Qualification, Benefits, SkillsRequired
+from create_class import RawTable, SearchResult, Qualification, Benefits, SkillsRequired, create_engine
 
 
 DB_URL = "postgresql://postgres:Workeye29@localhost:5432/alljobs"
@@ -16,16 +15,16 @@ def load_overall_data(search_criteria_id):
 
     for row in json_string:
         job_details = repr(row["job_details"]).replace("\n", ";")
-        print(job_details)
+
         data = SearchResult(
                     date_search = row["date_search"],
                     date_posted = row["date_posted"],
                     html_string = None,
-                    is_processed = True,
+                    is_processed = True,    
                     job_responsibility = job_details,
                     url_source = row["url_source"],
                     search_criteria_id = search_criteria_id,
-                    qualification = [Qualification(
+                    qualification = [Qualification( 
                         qualification = job_details,
                         years_of_experience = None,
                         company_name = row["company"],
@@ -39,4 +38,4 @@ def load_overall_data(search_criteria_id):
         session.commit()
         session.refresh(data)
         
-load_overall_data("fd7fd8c5-937c-4edf-bb19-8fa6fcebf252")
+load_overall_data("be8ffe30-ef58-421e-8569-4c2c3eba1f02")

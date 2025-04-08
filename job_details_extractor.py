@@ -12,7 +12,7 @@ engine = create_engine(DB_URL, pool_reset_on_return=None)
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
 
-def load_overall_data(search_criteria_id):
+def get_job_details(search_criteria_id):
     raw_data =  session.query(RawTable).filter_by(search_criteria_id=search_criteria_id).first()
     json_string =  json.loads(raw_data.raw_data)
     
@@ -26,8 +26,5 @@ def load_overall_data(search_criteria_id):
             
     return job
 
-result = load_overall_data("fd7fd8c5-937c-4edf-bb19-8fa6fcebf252")
 
-clean_text = re.sub(r"[\xa0\n\r\t]", ";", result[-2])  
-print(clean_text)
 

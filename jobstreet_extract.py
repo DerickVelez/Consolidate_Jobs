@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 import re
+from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
 
 
@@ -27,14 +27,17 @@ def find_job(job_keyword,location_keyword):
                 print(f"Page:{page_counter}")
                 
                 for index, job in enumerate(job_elements):
+                    
+                    if page_counter < 2 :  
                         
                         counter = f"Clicking job {index + 1}/{len(job_elements)} : {page_counter}"
                         print(counter)
                         job.scroll_into_view_if_needed()        
+                        
                         job.click(force=True, position={"x": 50, "y": 1})
                         
                         page.wait_for_selector('h1', timeout=15000)
-                        
+                         
                         #Extract the targeted css selector 
                         job_title = page.text_content('[data-automation="job-detail-title"]') or "N/A"
                         company_name = page.text_content('[data-automation="advertiser-name"]') or "N/A"
@@ -42,7 +45,8 @@ def find_job(job_keyword,location_keyword):
                         industry = page.text_content('[data-automation="job-detail-classifications"]') or "N/A"
                         job_type = page.text_content('[data-automation="job-detail-work-type"]') or "N/A"
                         job_details = page.text_content('[data-automation="jobAdDetails"]') or "N/A" 
-                        url_source = page.locator("h1.gepq850.eihuid4z").locator("a").get_attribute("href")
+                        url_source = page.text_content('[data-automation="job-detail-title"]') or "N/A"  
+                        # page.locator("h1.gepq850.eihuid4z").locator("a").get_attribute("href")
                         
                         salary_element = page.query_selector('[data-automation="job-detail-add-expected-salary"]')
                         
@@ -66,7 +70,7 @@ def find_job(job_keyword,location_keyword):
                                             "company": company_name, 
                                             "location": location,
                                             "Industry": industry, 
-                                            "date posted": job_type, 
+                                            "job_type": job_type, 
                                             "expected salary": salary,
                                             "date_search": date_searched.strftime("%Y-%m-%d"),
                                             "date_posted" : date_posted.strftime("%Y-%m-%d"),
@@ -75,6 +79,8 @@ def find_job(job_keyword,location_keyword):
                                             
                         jobs.append( job_overview)
                         page.wait_for_timeout(2000)
+                    else: 
+                        break
   
                 next_button = page.locator("a[aria-label='Next']")
 
